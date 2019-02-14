@@ -1,6 +1,6 @@
 #!/bin/python
 import random
-gridsize_x = 6
+gridsize_x = 5
 gridsize_y = 5
 def main():
     print("line5")
@@ -190,7 +190,7 @@ def compare(torpCount,listscore):
 # Draw Grid for DEATH Difficulty
 def drawGridDEATH(sea,gridsize_x,gridsize_y):
     print(" 012345")
-    
+
     for x in range(gridsize_x):
         print(x, end="  ")
         for y in range(gridsize_y):
