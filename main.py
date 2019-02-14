@@ -2,82 +2,53 @@
 import random
 gridsize_x = 5
 gridsize_y = 5
+
+
 def main():
-    print("line5")
-    Difficulty = input("What Difficulty do you want? Easy, Medium,Hard OR And we highly reccomend this DEATH")
-    if Difficulty == "DEATH":
-        gridsize_x = 11
-        gridsize_y = 10
-    else:
-        gridsize_x = 7
-        gridsize_y = 6
+    user_difficulty = get_user_difficulty()
 
-    playAgain = "y"
-
-    while playAgain == "y":
-        sea = setupGame(gridsize_x,gridsize_y) #call the subroutine to set up the game
-        if Difficulty == "Easy":
-            torpCount =  15
-        elif Difficulty == "Medium":
-            torpCount = 10
-        elif Difficulty == "Hard":
-            torpCount = 5
-        elif Difficulty == "DEATH":
-            torpCount = 10
-
-        gameWon = False
+    user_play_again = True
+    # Game difficulty torpedo count. 0 = Easy, 1 = medium etc.
+    game_difficulty_torpedos = [15,10,5,10]
+    while user_play_again:
+        game_map = init_game_map(gridsize_x,gridsize_y) #call the subroutine to set up the game
+        # Set the total user torpedos based on the difficulty
+        user_total_torpedos = game_difficulty_torpedos[user_difficulty]
+        user_curr_torpedos = user_total_torpedos
+        game_won = False
 
         print("Welcome to BattleShips!")
         print("An enemy ship is hidden somewhere at sea")
         print("We have no idea what a radar is so GEUSS!")
-        print("you only have",torpCount," torpedoes to hit it.")
+        print("you only have",user_total_torpedos," torpedoes to hit it.")
 
-        while not gameWon and torpCount > 0:
+        while user_curr_torpedos > 0:
             print()
-            drawGrid(sea,gridsize_x,gridsize_y) #Call the subroutine to draw the current state of the game
+            draw_grid(game_map,gridsize_x,gridsize_y) #Call the subroutine to draw the current state of the game
             print()
-            print("you have ", torpCount, "torpedoes left")
+            print("you have ", user_curr_torpedos, "torpedoes left")
             print("Enter the row and column seperatly to aim your torpedo.")
 
-            tryX = int(input("Row?"))
-            tryY = int(input("Column?"))
-            if sea[tryX][tryY] == "M":
+            user_target_x = int(input("Row?"))
+            user_target_y = int(input("Column?"))
+            if game_map[user_target_x][user_target_y] == "M":
                 print("Holy fork you are dumb")
 
-            else:
-                if sea[tryX][tryY] == ".":
-                    sea[tryX][tryY] = "M"
+            elif game_map[user_target_x][user_target_y] == ".":
+                game_map[user_target_x][user_target_y] = "M"
 
-                if sea[tryX][tryY] == "S":
-                    sea[tryX][tryY] = "X"
-                    gameWon = True
-            torpCount = torpCount - 1
+            elif game_map[user_target_x][user_target_y] == "S":
+                game_map[user_target_x][user_target_y] = "X"
+                game_won = True
+                draw_grid(game_map,gridsize_x,gridsize_y)
+                print("You won the game!")
+                break
+            user_curr_torpedos -= 1
 
-        print()
-        drawGrid(sea,gridsize_x,gridsize_y)
-        print()
-
-        if gameWon == True:
-            if Difficulty == "Easy":
-                torpCount = torpCount - 15
-            elif Difficulty == "Medium":
-                torpCount = torpCount - 10
-            elif Difficulty == "Hard":
-                torpCount = torpCount - 5
-            elif Difficulty == "DEATH":
-                torpCount = torpCount - 10
-            print("WOW NICE JOB YOU LUCKY BICH YOU WON BUT YOU LOST US ", torpCount, "TORPEDO NICE JOB")
-            print("TRY ANOTHER MODE IF YOU WANT")
-            if Difficulty == "Easy":
-                torpCount = torpCount + 15
-            elif Difficulty == "Medium":
-                torpCount = torpCount + 10
-            elif Difficulty == "Hard":
-                torpCount = torpCount + 5
-            elif Difficulty == "DEATH":
-                torpCount = torpCount + 10
-            torpCount = newscore
-
+        if game_won == True:
+            print("You won the game with ", user_curr_torpedos, "out of ", user_total_torpedos, " torpedos left")
+            score = user_curr_torpedos * game_difficulty_torpedos[user_difficulty]
+            print(score)
 
             contents = []
             file = open("Highscorenumbers.txt","r")
@@ -179,6 +150,22 @@ def main():
         print()
         playAgain = input("Do you want to fail I mean TRY again y/n?")
 
+def get_user_difficulty():
+    while True:
+        print("[1]. Easy")
+        print("[2]. Medium")
+        print("[3]. Hard")
+        print("[4]. DEATH")
+        # take's the user's desired difficulty as a string
+        user_difficulty_str = input("Please enter 1,2,3 or 4: ")
+        if user_difficulty_str == "1" or user_difficulty_str == "2" or user_difficulty_str == "3" or user_difficulty_str == "4":
+            print("Correct Conditions")
+            # Converts the string to an integer if it matches the variables
+            return int(user_difficulty_str) - 1
+            break
+        else:
+            print("stop it. get some help.")
+
 # Basic Comparison Funciton
 def compare(torpCount,listscore):
     if torpCount > listscore:
@@ -186,36 +173,19 @@ def compare(torpCount,listscore):
     else:
         return False
 
-
-# Draw Grid for DEATH Difficulty
-def drawGridDEATH(sea,gridsize_x,gridsize_y):
-    print(" 012345")
-
-    for x in range(gridsize_x):
-        print(x, end="  ")
-        for y in range(gridsize_y):
-            if  sea[x][y] == "S":
-                print(".", end="")
-            if  sea[x][y] == "M":
-                print("M", end="")
-            if  sea[x][y] == "X":
-                print("X", end="")
-            if  sea[x][y] == ".":
-                print(".", end="")
-        print()
-
 #Setup the game
-def setupGame(gridsize_x,gridsize_y):
-    sea = [["." for y in range(gridsize_y) ] for x in range(gridsize_x)]
+def init_game_map(gridsize_x,gridsize_y):
+    game_map = [["." for y in range(gridsize_y) ] for x in range(gridsize_x)]
     #Hide a ship at a random position
-    shipX = random.randrange(gridsize_x)
-    shipY = random.randrange(gridsize_y)
-    print("shipx", shipX, "shipY", shipY)
-    sea[shipX][shipY] = "S"
-    return sea
+
+    game_ship_location_x = random.randrange(gridsize_x)
+    game_ship_location_y = random.randrange(gridsize_y)
+    print("shipx", game_ship_location_x, "shipY", game_ship_location_y)
+    game_map[game_ship_location_x][game_ship_location_y] = "S"
+    return game_map
 
 #Draw Grid for other difficulties
-def drawGrid(sea,gridsize_x,gridsize_y):
+def draw_grid(game_map,gridsize_x,gridsize_y):
 
     grid = "  "
     for x in range(gridsize_x - 1):
@@ -224,13 +194,13 @@ def drawGrid(sea,gridsize_x,gridsize_y):
     for x in range(gridsize_x - 1):
         print(x, end=" ")
         for y in range(gridsize_y):
-            if  sea[x][y] == "S":
+            if  game_map[x][y] == "S":
                  print(".", end=" ")
-            if  sea[x][y] == "M":
+            if  game_map[x][y] == "M":
                 print("M", end=" ")
-            if  sea[x][y] == "X":
+            if  game_map[x][y] == "X":
                 print("X", end=" ")
-            if  sea[x][y] == ".":
+            if  game_map[x][y] == ".":
                 print(".", end=" ")
         print()
 
