@@ -1,5 +1,4 @@
 #!/bin/python
-#battleships
 import random
 gridsize_x = 6
 gridsize_y = 5
