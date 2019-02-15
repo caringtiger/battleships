@@ -3,14 +3,14 @@ import random
 gridsize_x = 5
 gridsize_y = 5
 
+# Game difficulty torpedo count. 0 = Easy, 1 = medium etc.
+game_difficulty_torpedos = [15,10,5,10]
 
 def main():
     user_difficulty = get_user_difficulty()
 
     user_play_again = True
-    # Game difficulty torpedo count. 0 = Easy, 1 = medium etc.
-    game_difficulty_torpedos = [15,10,5,10]
-    while user_play_again:
+    while user_play_again == True:
         game_map = init_game_map(gridsize_x,gridsize_y) #call the subroutine to set up the game
         # Set the total user torpedos based on the difficulty
         user_total_torpedos = game_difficulty_torpedos[user_difficulty]
@@ -49,106 +49,25 @@ def main():
             print("You won the game with ", user_curr_torpedos, "out of ", user_total_torpedos, " torpedos left")
             score = user_curr_torpedos * game_difficulty_torpedos[user_difficulty]
             print(score)
-
-            contents = []
-            file = open("Highscorenumbers.txt","r")
-            data = file.readline()
-            file.close()
-            data = data.replace(" ","")
-            content = data.split(",")
-            for num in content:
-                contents.append(num)
-            del contents[-1]
-            print("Current List of HighScore\n")
-            print(contents)
-            for i in range(len(contents)):
-                print(contents[i])
-
-            open("Highscorenumbers.txt", 'w').close()
-
-            firstplace = compare(torpCount(int(contents[0])))
-            secondplace = compare(torpCount(int(contents[1])))
-            thirdplace = compare(torpCount(int(contents[2])))
-            fourthplace = compare(torpCount(int(contents[3])))
-            print(contents)
-
-            if firstplace == True:
-                del contents[-1]
-                contents.insert(0,torpCount)
-                print("1st place\n {}".format(contents))
-            elif secondplace == True:
-                del contents[-1]
-                contents.insert(1,torpCount)
-                print("2nd place\n {}".format(contents))
-            elif thirdplace == True:
-                del contents[-1]
-                contents.insert(2,torpCount)
-                print("3rd place\n {}".format(contents))
-            elif fourthplace == True:
-                del contents[-1]
-                contents.insert(3,torpCount)
-                print("4th place\n {}".format(contents))
-            else:
-                print("Score did not make it onto the leader board")
-
-
-            file = open("Highscorenumbers.txt","w")
-            for i in range(len(contents)):
-                file.write(str(contents[i])+",")
-            file.close()
-
+            save_game(score)
         else:
             print("YOU ARE USELESS YOU COULDNT EVEN FIGURE OUT HOW TO USE RADAR YOU JUST GEUSSED YOU IDIOT")
             print("TRY ANOTHER MODE IF YOU WANT")
-            contents = []
-            file = open("Highscorenumbers.txt","r")
-            data = file.readline()
-            file.close()
-            data = data.replace(" ","")
-            content = data.split(",")
-            for num in content:
-                contents.append(num)
-            del contents[-1]
-            print("Current List of HighScore\n")
-            print(contents)
-            for i in range(len(contents)):
-                print(contents[i])
-
-            open("Highscorenumbers.txt", 'w').close()
-
-            firstplace = compare(torpCount(int(contents[0])))
-            secondplace = compare(torpCount(int(contents[1])))
-            thirdplace = compare(torpCount(int(contents[2])))
-            fourthplace = compare(torpCount(int(contents[3])))
-            print(contents)
-
-            if firstplace == True:
-                del contents[-1]
-                contents.insert(0,torpCount)
-                print("1st place\n {}".format(contents))
-            elif secondplace == True:
-                del contents[-1]
-                contents.insert(1,torpCount)
-                print("2nd place\n {}".format(contents))
-            elif thirdplace == True:
-                del contents[-1]
-                contents.insert(2,torpCount)
-                print("3rd place\n {}".format(contents))
-            elif fourthplace == True:
-                del contents[-1]
-                contents.insert(3,torpCount)
-                print("4th place\n {}".format(contents))
-            else:
-                print("Score did not make it onto the leader board")
 
 
-            file = open("Highscorenumbers.txt","w")
-            for i in range(len(contents)):
-                file.write(str(contents[i])+",")
-            file.close()
+        user_difficulty_str = input("Do you want to play again? (y/n)")
+        if user_difficulty_str.lower() == "n":
+            print("Thank you for playing!")
+            exit()
 
-        print()
-        playAgain = input("Do you want to fail I mean TRY again y/n?")
+
+def save_game(score):
+    with open('highscore.txt', 'r') as read_file:
+        file_buffer = [int(x) for x in read_file.read().splitlines()]
+        file_buffer.append(score)
+        file_buffer.sort()
+        with open('highscore.txt', 'w') as write_file:
+            write_file.write('\n'.join(str(line) for line in file_buffer))
 
 def get_user_difficulty():
     while True:
@@ -165,13 +84,6 @@ def get_user_difficulty():
             break
         else:
             print("stop it. get some help.")
-
-# Basic Comparison Funciton
-def compare(torpCount,listscore):
-    if torpCount > listscore:
-        return True
-    else:
-        return False
 
 #Setup the game
 def init_game_map(gridsize_x,gridsize_y):
@@ -203,5 +115,4 @@ def draw_grid(game_map,gridsize_x,gridsize_y):
             if  game_map[x][y] == ".":
                 print(".", end=" ")
         print()
-
 main()
