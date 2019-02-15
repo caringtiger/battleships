@@ -1,7 +1,12 @@
 #!/bin/python
 import random
-gridsize_x = 5
-gridsize_y = 5
+
+if user_difficult == "4":
+    gridsize_x = 11
+    gridsize_y = 11
+else:
+    gridsize_x = 7
+    gridsize_y = 6
 
 # Game difficulty torpedo count. 0 = Easy, 1 = medium etc.
 game_difficulty_torpedos = [15,10,5,10]
